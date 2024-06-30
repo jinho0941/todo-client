@@ -6,18 +6,14 @@ import { ReactQueryDevtools } from 'react-query/devtools'
 
 interface ReactQueryProviderProps {
   children: ReactNode
-  dehydratedState: unknown
 }
 
-export function ReactQueryProvider({
-  children,
-  dehydratedState,
-}: ReactQueryProviderProps) {
+export function ReactQueryProvider({ children }: ReactQueryProviderProps) {
   const [queryClient] = useState(() => new QueryClient())
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Hydrate state={dehydratedState}>{children}</Hydrate>
+      <Hydrate>{children}</Hydrate>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
