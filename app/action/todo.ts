@@ -15,7 +15,8 @@ export const createTodo = async (
   try {
     await api.post('/todos', { title, description })
 
-    revalidatePath('/server-component-fetch', 'page')
+    revalidatePath('/')
+    revalidatePath('/server-component-fetch')
     return { success: true, message: '성공' }
   } catch (error) {
     return { success: false, message: '실패' }
@@ -26,7 +27,8 @@ export const deleteTodo = async (todoId: string): Promise<ActionType> => {
   try {
     await api.delete(`/todos/${todoId}`)
 
-    revalidatePath('/server-component-fetch', 'page')
+    revalidatePath('/')
+    revalidatePath('/server-component-fetch')
     return { success: true, message: '성공' }
   } catch (error) {
     return { success: false, message: '실패' }
@@ -39,7 +41,8 @@ export const updateTodoCompletion = async (
   try {
     await api.patch(`/todos/${todoId}/completed`, { completed: true })
 
-    revalidatePath('/server-component-fetch', 'page')
+    revalidatePath('/')
+    revalidatePath('/server-component-fetch')
     return { success: true, message: '성공' }
   } catch (error) {
     return { success: false, message: '실패' }
@@ -55,7 +58,8 @@ export const updateTodoDescription = async (
       description,
     })
 
-    revalidatePath('/server-component-fetch', 'page')
+    revalidatePath('/')
+    revalidatePath('/server-component-fetch')
     return { success: true, message: '성공' }
   } catch (error) {
     return { success: false, message: '실패' }
@@ -69,7 +73,8 @@ export const updateTodoTitle = async (
   try {
     await api.patch(`/todos/${todoId}/title`, { title })
 
-    revalidatePath('/server-component-fetch', 'page')
+    revalidatePath('/')
+    revalidatePath('/server-component-fetch')
     return { success: true, message: '성공' }
   } catch (error) {
     return { success: false, message: '실패' }
