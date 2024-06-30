@@ -19,15 +19,19 @@ export default function Home() {
   const [todoList, setTodoList] = useState<Todo[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [fetchTime, setFetchTime] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchTodos = async () => {
+      const startTime = performance.now()
       try {
         const response = await api.get<Todo[]>('/todos')
         setTodoList(response.data)
       } catch (error) {
         setError('Error fetching todo list')
       } finally {
+        const endTime = performance.now()
+        setFetchTime(endTime - startTime)
         setIsLoading(false)
       }
     }
@@ -67,6 +71,12 @@ export default function Home() {
       <CreateTodoForm onCreate={onCreate} />
       <ul className='h-[300px] w-[300px] overflow-y-scroll overflow-x-hidden p-2 bg-slate-100 rounded-md space-y-4 relative'>
         {isLoading && <Loading />}
+        {!isLoading && fetchTime !== null && (
+          <div className='text-gray-500 text-sm'>
+            Fetch time:{' '}
+            <span className='font-bold'>{fetchTime.toFixed(2)} ms</span>
+          </div>
+        )}
         {todoList.map((todo) => (
           <TodoItem
             key={todo.id}

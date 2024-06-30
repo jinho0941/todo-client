@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from 'react-query'
-
+import { useState } from 'react'
 import { api } from '@/app/utils'
 import { Loading } from '@/components/loading'
 import { TodoItem } from '@/components/todo-item'
@@ -23,13 +23,17 @@ interface CreateTodoInput {
 
 export default function Home() {
   const queryClient = useQueryClient()
+  const [fetchTime, setFetchTime] = useState<number | null>(null)
 
   const {
     data: todoList = [],
     isLoading,
     error,
   } = useQuery<Todo[]>('todos', async (): Promise<Todo[]> => {
+    const start = Date.now()
     const response = await api.get<Todo[]>('/todos')
+    const end = Date.now()
+    setFetchTime(end - start)
     return response.data
   })
 
@@ -85,7 +89,13 @@ export default function Home() {
   return (
     <div className='flex flex-col gap-y-2'>
       <CreateTodoForm onCreate={onCreate} />
+
       <ul className='h-[300px] w-[300px] overflow-y-scroll overflow-x-hidden p-2 bg-slate-100 rounded-md space-y-4 relative'>
+        {fetchTime !== null && (
+          <p className='text-sm text-gray-500'>
+            Fetch time: <span className='font-bold'>{fetchTime} ms</span>
+          </p>
+        )}
         {isLoading && <Loading />}
         {todoList.map((todo) => (
           <TodoItem

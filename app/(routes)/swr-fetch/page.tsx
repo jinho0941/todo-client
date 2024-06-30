@@ -1,6 +1,7 @@
 'use client'
 
 import useSWR, { mutate } from 'swr'
+import { useState, useEffect } from 'react'
 
 import { api } from '@/app/utils'
 import { Loading } from '@/components/loading'
@@ -17,12 +18,25 @@ export interface Todo {
 }
 
 const fetcher = async (url: string) => {
+  const startTime = performance.now()
   const response = await api.get(url)
-  return response.data
+  const endTime = performance.now()
+  const fetchTime = endTime - startTime
+  return { data: response.data, fetchTime }
 }
 
 export default function Home() {
-  const { data, error, isLoading } = useSWR<Todo[]>('/todos', fetcher)
+  const { data, error, isLoading } = useSWR<{
+    data: Todo[]
+    fetchTime: number
+  }>('/todos', fetcher)
+  const [fetchTime, setFetchTime] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (data) {
+      setFetchTime(data.fetchTime)
+    }
+  }, [data])
 
   const onCreate = async (title: string, description: string) => {
     try {
@@ -60,8 +74,14 @@ export default function Home() {
       <CreateTodoForm onCreate={onCreate} />
       <ul className='h-[300px] w-[300px] overflow-y-scroll overflow-x-hidden p-2 bg-slate-100 rounded-md space-y-4 relative'>
         {isLoading && <Loading />}
-        {data &&
-          data.map((todo) => (
+        {!isLoading && fetchTime !== null && (
+          <div className='text-gray-500 text-sm'>
+            Fetch time:{' '}
+            <span className='font-bold'>{fetchTime.toFixed(2)} ms</span>
+          </div>
+        )}
+        {data?.data &&
+          data.data.map((todo) => (
             <TodoItem
               key={todo.id}
               id={todo.id}
