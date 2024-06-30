@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 
 import { updateTodoDescription } from '@/app/action/todo'
+import { toast } from 'sonner'
+import { Loading } from '@/components/loading'
 
 type Props = {
   id: string
@@ -18,11 +20,22 @@ export const ServerTodoDescription = ({
   const [isDescriptionEdit, setIsDescriptionEdit] = useState(false)
   const [editDescription, setEditDescription] = useState(description)
 
-  const handleDescriptionEdit = async () => {
-    if (isDescriptionEdit) {
-      await updateTodoDescription(id, editDescription)
-    }
-    setIsDescriptionEdit(!isDescriptionEdit)
+  const [isPending, startTransition] = useTransition()
+
+  const onEdit = () => {
+    setIsDescriptionEdit(true)
+  }
+
+  const handleDescriptionEdit = () => {
+    startTransition(async () => {
+      const action = await updateTodoDescription(id, editDescription)
+      if (!action.success) {
+        toast.error(action.message)
+        return
+      }
+      toast.success(action.message)
+    })
+    setIsDescriptionEdit(false)
   }
 
   const handleCancelEdit = () => {
@@ -32,6 +45,7 @@ export const ServerTodoDescription = ({
 
   return (
     <>
+      {isPending && <Loading />}
       <p
         className={`break-words ${
           isCompleted ? 'line-through text-gray-500' : ''
@@ -65,7 +79,7 @@ export const ServerTodoDescription = ({
         </>
       ) : (
         <button
-          onClick={() => setIsDescriptionEdit(true)}
+          onClick={onEdit}
           className='py-1 px-2 rounded-md border bg-zinc-500 text-white hover:bg-zinc-600 text-xs w-full block'
         >
           내용 수정

@@ -1,14 +1,26 @@
 'use client'
 
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { useState, useTransition } from 'react'
+
 import { createTodo } from '@/app/action/todo'
-import { useState } from 'react'
 
 export const ServerCreateTodoForm = () => {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    await createTodo(title, description)
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = (e: React.FormEvent) => {
+    startTransition(async () => {
+      const action = await createTodo(title, description)
+      if (!action.success) {
+        toast.error(action.message)
+        return
+      }
+      toast.success(action.message)
+    })
     e.preventDefault()
     setTitle('')
     setDescription('')
@@ -31,9 +43,10 @@ export const ServerCreateTodoForm = () => {
       />
       <button
         type='submit'
-        className='bg-stone-500 text-white rounded-lg hover:bg-stone-600'
+        className='bg-stone-500 text-white rounded-lg hover:bg-stone-600 py-2 flex justify-center disabled:bg-stone-500 disabled:cursor-not-allowed'
+        disabled={isPending}
       >
-        생성
+        {isPending ? <Loader2 className='animate-spin' /> : '생성'}
       </button>
     </form>
   )

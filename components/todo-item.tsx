@@ -27,7 +27,7 @@ export const TodoItem = ({
   const [editDescription, setEditDescription] = useState(description)
 
   return (
-    <li className='p-2 rounded-md bg-stone-200'>
+    <li className='p-2 rounded-md bg-stone-200 relative'>
       <TodoTitle
         id={id}
         title={editTitle}

@@ -17,7 +17,7 @@ export const ServerTodoItem = ({
   completed,
 }: Props) => {
   return (
-    <li className='p-2 rounded-md bg-stone-200'>
+    <li className='p-2 rounded-md bg-stone-200 relative'>
       <ServerTodoTitle id={id} title={title} isCompleted={completed} />
       <ServerTodoDescription
         id={id}

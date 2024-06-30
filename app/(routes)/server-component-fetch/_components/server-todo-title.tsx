@@ -1,7 +1,10 @@
 'use client'
 
+import { toast } from 'sonner'
+import { useState, useTransition } from 'react'
+
+import { Loading } from '@/components/loading'
 import { updateTodoTitle } from '@/app/action/todo'
-import { useState } from 'react'
 
 type Props = {
   id: string
@@ -12,12 +15,26 @@ type Props = {
 export const ServerTodoTitle = ({ id, title, isCompleted }: Props) => {
   const [isTitleEdit, setIsTitleEdit] = useState(false)
   const [editTitle, setEditTitle] = useState(title)
+  const [isPending, startTransition] = useTransition()
 
-  const handleTitleEdit = async () => {
-    if (isTitleEdit) {
-      await updateTodoTitle(id, editTitle)
+  const onEdit = () => {
+    setIsTitleEdit(true)
+  }
+
+  const handleTitleEdit = () => {
+    if (!editTitle) {
+      toast.error('제목을 입력해주세요.')
+      return
     }
-    setIsTitleEdit(!isTitleEdit)
+    startTransition(async () => {
+      const action = await updateTodoTitle(id, editTitle)
+      if (!action.success) {
+        toast.error(action.message)
+        return
+      }
+      toast.success(action.message)
+    })
+    setIsTitleEdit(false)
   }
 
   const handleCancelEdit = () => {
@@ -27,6 +44,7 @@ export const ServerTodoTitle = ({ id, title, isCompleted }: Props) => {
 
   return (
     <>
+      {isPending && <Loading />}
       <h2
         className={`font-bold ${
           isCompleted ? 'line-through text-gray-500' : ''
@@ -60,7 +78,7 @@ export const ServerTodoTitle = ({ id, title, isCompleted }: Props) => {
         </>
       ) : (
         <button
-          onClick={handleTitleEdit}
+          onClick={onEdit}
           className='py-1 px-2 rounded-md border bg-slate-500 text-white hover:bg-slate-600 text-xs w-full block'
         >
           제목 수정

@@ -1,6 +1,7 @@
-import { useState } from 'react'
-
+import { useState, useTransition } from 'react'
 import { api } from '@/app/utils'
+import { toast } from 'sonner'
+import { Loading } from './loading'
 
 type Props = {
   id: string
@@ -17,19 +18,28 @@ export const TodoDescription = ({
 }: Props) => {
   const [isDescriptionEdit, setIsDescriptionEdit] = useState(false)
   const [editDescription, setEditDescription] = useState(description)
+  const [isPending, startTransition] = useTransition()
 
-  const handleDescriptionEdit = async () => {
-    if (isDescriptionEdit) {
+  const handleDescriptionEdit = () => {
+    if (!editDescription) {
+      toast.error('내용을 입력해주세요.')
+      return
+    }
+    startTransition(async () => {
       try {
         await api.patch(`/todos/${id}/description`, {
           description: editDescription,
         })
         onUpdate(editDescription)
       } catch (error) {
-        console.error('Error updating description:', error)
+        toast.error('내용 수정에 실패하였습니다.')
       }
-    }
-    setIsDescriptionEdit(!isDescriptionEdit)
+    })
+    setIsDescriptionEdit(false)
+  }
+
+  const onEdit = () => {
+    setIsDescriptionEdit(true)
   }
 
   const handleCancelEdit = () => {
@@ -39,6 +49,7 @@ export const TodoDescription = ({
 
   return (
     <>
+      {isPending && <Loading />}
       <p
         className={`break-words ${
           isCompleted ? 'line-through text-gray-500' : ''
@@ -72,7 +83,7 @@ export const TodoDescription = ({
         </>
       ) : (
         <button
-          onClick={() => setIsDescriptionEdit(true)}
+          onClick={onEdit}
           className='py-1 px-2 rounded-md border bg-zinc-500 text-white hover:bg-zinc-600 text-xs w-full block'
         >
           내용 수정

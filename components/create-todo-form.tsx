@@ -34,7 +34,7 @@ export const CreateTodoForm = ({ onCreate }: Props) => {
       />
       <button
         type='submit'
-        className='bg-stone-500 text-white rounded-lg hover:bg-stone-600'
+        className='bg-stone-500 text-white rounded-lg hover:bg-stone-600 py-2'
       >
         생성
       </button>
