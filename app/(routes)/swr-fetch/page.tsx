@@ -7,6 +7,7 @@ import { api } from '@/app/utils'
 import { Loading } from '@/components/loading'
 import { TodoItem } from '@/components/todo-item'
 import { CreateTodoForm } from '@/components/create-todo-form'
+import { toast } from 'sonner'
 
 export interface Todo {
   id: string
@@ -44,7 +45,7 @@ export default function Home() {
       const newTodo = response.data
       mutate('/todos', (todos = []) => [newTodo, ...todos], false)
     } catch (error) {
-      console.log(error)
+      toast.error('생성 실패')
     }
   }
 
@@ -57,7 +58,7 @@ export default function Home() {
         false,
       )
     } catch (error) {
-      console.log(error)
+      toast.error('삭제 실패')
     }
   }
 
