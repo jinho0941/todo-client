@@ -3,9 +3,9 @@
 import useSWR, { mutate } from 'swr'
 
 import { api } from '@/app/utils'
+import { Loading } from '@/components/loading'
 import { TodoItem } from '@/components/todo-item'
 import { CreateTodoForm } from '@/components/create-todo-form'
-import { Logo } from '@/components/logo'
 
 export interface Todo {
   id: string
@@ -47,14 +47,6 @@ export default function Home() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className='bg-stone-200 min-h-screen text-black flex justify-center items-center'>
-        Loading...
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className='bg-stone-200 min-h-screen text-black flex justify-center items-center'>
@@ -66,7 +58,8 @@ export default function Home() {
   return (
     <div className='flex flex-col gap-y-2'>
       <CreateTodoForm onCreate={onCreate} />
-      <ul className='h-[300px] w-[300px] overflow-y-scroll overflow-x-hidden p-2 bg-slate-100 rounded-md space-y-4'>
+      <ul className='h-[300px] w-[300px] overflow-y-scroll overflow-x-hidden p-2 bg-slate-100 rounded-md space-y-4 relative'>
+        {isLoading && <Loading />}
         {data &&
           data.map((todo) => (
             <TodoItem
